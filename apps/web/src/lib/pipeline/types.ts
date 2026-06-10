@@ -1,0 +1,59 @@
+export type Candidate = {
+  id: string; // raw_item id
+  title: string;
+  content: string;
+  source_id: string | null;
+  source_name: string;
+  url: string | null;
+  trust: number;
+};
+
+export type Scored = {
+  id: string;
+  category_slug: string | null;
+  audience: string[];
+  importance: number;
+  novelty: number;
+  risk: number;
+  summary: string;
+  reason: string;
+};
+
+export type MainStory = {
+  news_id: string;
+  source_url: string | null;
+  title: string;
+  what: string;
+  why: string;
+  who: string;
+  how: string;
+  warning: string;
+  our_take: string; // «بعين الشاهين»
+};
+
+export type RoundupItem = {
+  news_id: string;
+  source_url: string | null;
+  title: string;
+  blurb: string;
+};
+
+export type ToolItem = {
+  news_id: string;
+  source_url: string | null;
+  name: string;
+  blurb: string;
+};
+
+export type IssueBody = {
+  tldr_bullets: string[];
+  main: MainStory | null;
+  roundup: RoundupItem[];
+  tools: ToolItem[];
+};
+
+export type BrandVoice = {
+  name: string;
+  tone: string;
+  bannedWords: string[];
+};
