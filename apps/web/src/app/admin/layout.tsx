@@ -33,6 +33,8 @@ export default async function AdminLayout({
 
   const nav = [
     { href: "/admin", label: "الرئيسية" },
+    { href: "/admin/sources", label: "المصادر" },
+    { href: "/admin/raw-feed", label: "المحتوى الخام" },
     { href: "/admin/brand", label: "الهوية والنبرة" },
   ];
 
