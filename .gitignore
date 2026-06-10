@@ -1,0 +1,37 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# next.js
+.next/
+out/
+build/
+dist/
+
+# env — NEVER commit real secrets
+.env
+.env.local
+.env*.local
+*.env.local
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# testing / coverage
+coverage/
+
+# misc
+.turbo/
+.vercel/

@@ -1,0 +1,16 @@
+{
+  "name": "marsad",
+  "version": "0.0.0",
+  "private": true,
+  "description": "محرك نشرة ومدونة ذكية عربية — Marsad (temporary name, change via BRAND_NAME)",
+  "packageManager": "pnpm@10.19.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "start": "pnpm --filter web start",
+    "lint": "pnpm --filter web lint"
+  }
+}

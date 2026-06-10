@@ -1,0 +1,9 @@
+packages:
+  - "apps/*"
+  - "services/*"
+  - "packages/*"
+
+onlyBuiltDependencies:
+  - sharp
+ignoredBuiltDependencies:
+  - unrs-resolver
