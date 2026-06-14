@@ -1,6 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { chatJSON, resetModelCache } from "@/lib/openrouter";
+import { chatJSON, resetModelCache, resetUsage, getUsage } from "@/lib/openrouter";
 import type { Json } from "@/lib/database.types";
 import * as P from "./prompts";
 import type {
@@ -73,6 +73,7 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
   const supabase = createAdminClient();
   const limit = opts?.candidateLimit ?? CANDIDATE_LIMIT;
   resetModelCache(); // pick up any model changes made from /admin/models
+  resetUsage(); // start token/cost accounting for this run
 
   const { data: run } = await supabase
     .from("pipeline_runs")
@@ -304,6 +305,7 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
           relevant_pool: pool.length,
           relevance_dropped: dropped,
           draft_id: draft?.id,
+          tokens: getUsage(),
         } as Json,
       })
       .eq("id", runId);
@@ -319,7 +321,12 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
     const msg = e instanceof Error ? e.message : String(e);
     await supabase
       .from("pipeline_runs")
-      .update({ status: "failed", error: msg, finished_at: new Date().toISOString() })
+      .update({
+        status: "failed",
+        error: msg,
+        finished_at: new Date().toISOString(),
+        state: { tokens: getUsage() } as Json,
+      })
       .eq("id", runId);
     await supabase.from("errors_log").insert({ level: "error", source: "pipeline:build", message: msg });
     return { runId, draftId: null, candidates: 0, scored: 0, status: "failed", error: msg };

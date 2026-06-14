@@ -25,6 +25,43 @@ export function resetModelCache() {
   modelCache = null;
 }
 
+// ── token/cost accounting (per pipeline run) ──
+export type Usage = {
+  prompt: number;
+  completion: number;
+  total: number;
+  cost: number; // USD
+  calls: number;
+  byTask: Record<string, { tokens: number; cost: number; calls: number }>;
+};
+
+let usage: Usage = blankUsage();
+function blankUsage(): Usage {
+  return { prompt: 0, completion: 0, total: 0, cost: 0, calls: 0, byTask: {} };
+}
+export function resetUsage() {
+  usage = blankUsage();
+}
+export function getUsage(): Usage {
+  return usage;
+}
+function recordUsage(task: string, u: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number; cost?: number }) {
+  const pt = u.prompt_tokens ?? 0;
+  const ct = u.completion_tokens ?? 0;
+  const tt = u.total_tokens ?? pt + ct;
+  const cost = u.cost ?? 0;
+  usage.prompt += pt;
+  usage.completion += ct;
+  usage.total += tt;
+  usage.cost += cost;
+  usage.calls += 1;
+  const bt = usage.byTask[task] ?? { tokens: 0, cost: 0, calls: 0 };
+  bt.tokens += tt;
+  bt.cost += cost;
+  bt.calls += 1;
+  usage.byTask[task] = bt;
+}
+
 export type ChatArgs = {
   task: string; // key in ai_models_config
   system: string;
@@ -45,6 +82,7 @@ export async function chat(args: ChatArgs): Promise<string> {
       { role: "user", content: args.user },
     ],
     temperature: args.temperature ?? cfg.temperature,
+    usage: { include: true }, // ask OpenRouter to return token counts + cost
   };
   const mt = args.maxTokens ?? cfg.max_tokens;
   if (mt) body.max_tokens = mt;
@@ -66,6 +104,7 @@ export async function chat(args: ChatArgs): Promise<string> {
     throw new Error(`OpenRouter ${cfg.model} ${res.status}: ${t.slice(0, 300)}`);
   }
   const data = await res.json();
+  if (data.usage) recordUsage(args.task, data.usage);
   return data.choices?.[0]?.message?.content ?? "";
 }
 
