@@ -65,4 +65,6 @@ Bias toward caution over speed; for trivial tasks, use judgment.
 
 <!-- SPECKIT START -->
 **New session? Start with `docs/HANDOFF.md`** — current state, what's built, what's left, and the Spec Kit workflow to continue. For additional context about technologies, project structure, and commands, read the current plan.
+
+**Active plan**: `specs/002-real-publishing/plan.md` (Phase 7 — Real Publishing: email + blog + Telegram, X deferred). Baseline reference: `specs/001-baseline-as-built/spec.md`. Constitution: `.specify/memory/constitution.md` (v1.0.0).
 <!-- SPECKIT END -->
