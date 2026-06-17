@@ -12,9 +12,14 @@ export default async function Home() {
       {brand?.tagline && (
         <p className="max-w-xl text-lg text-muted-foreground">{brand.tagline}</p>
       )}
-      <Link href="/admin" className={buttonVariants()}>
-        لوحة التحكم
-      </Link>
+      <div className="flex gap-3">
+        <Link href="/issues" className={buttonVariants()}>
+          كل الأعداد
+        </Link>
+        <Link href="/admin" className={buttonVariants({ variant: "outline" })}>
+          لوحة التحكم
+        </Link>
+      </div>
     </main>
   );
 }
