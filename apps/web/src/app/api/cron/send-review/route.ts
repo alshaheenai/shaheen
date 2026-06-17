@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendReview } from "@/lib/telegram";
+import { getPostHogClient } from "@/lib/posthog";
 
 export const runtime = "nodejs";
 
@@ -29,9 +30,15 @@ export async function POST(request: NextRequest) {
 
   try {
     await sendReview(draft);
+    getPostHogClient().capture({
+      distinctId: "system",
+      event: "draft_sent_for_review",
+      properties: { draft_id: draft.id },
+    });
     return NextResponse.json({ ok: true, draftId: draft.id });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    getPostHogClient().captureException(e, "system", { draft_id: draft.id });
     return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }

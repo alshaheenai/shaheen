@@ -1,6 +1,7 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { chatJSON, resetModelCache, resetUsage, getUsage } from "@/lib/openrouter";
+import { getPostHogClient } from "@/lib/posthog";
 import type { Json } from "@/lib/database.types";
 import * as P from "./prompts";
 import type {
@@ -81,6 +82,12 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
     .select("id")
     .single();
   const runId = run!.id;
+
+  getPostHogClient().capture({
+    distinctId: "system",
+    event: "pipeline_run_started",
+    properties: { run_id: runId, candidate_limit: limit },
+  });
 
   try {
     const { data: brand } = await supabase
@@ -310,6 +317,20 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
       })
       .eq("id", runId);
 
+    const posthog = getPostHogClient();
+    posthog.capture({
+      distinctId: "system",
+      event: "pipeline_run_completed",
+      properties: {
+        run_id: runId,
+        candidates: candidates.length,
+        scored: scored.length,
+        relevant_pool: pool.length,
+        relevance_dropped: dropped,
+        draft_id: draft?.id ?? null,
+      },
+    });
+
     return {
       runId,
       draftId: draft?.id ?? null,
@@ -329,6 +350,13 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
       })
       .eq("id", runId);
     await supabase.from("errors_log").insert({ level: "error", source: "pipeline:build", message: msg });
+    const posthog = getPostHogClient();
+    posthog.captureException(e, "system", { run_id: runId, error: msg });
+    posthog.capture({
+      distinctId: "system",
+      event: "pipeline_run_failed",
+      properties: { run_id: runId, error: msg },
+    });
     return { runId, draftId: null, candidates: 0, scored: 0, status: "failed", error: msg };
   }
 }

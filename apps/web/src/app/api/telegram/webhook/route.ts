@@ -2,6 +2,7 @@ import { after, NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { tg, handleReviewAction, sendReview } from "@/lib/telegram";
 import { buildDailyIssue } from "@/lib/pipeline/run";
+import { getPostHogClient } from "@/lib/posthog";
 
 export const runtime = "nodejs";
 
@@ -29,6 +30,11 @@ export async function POST(req: NextRequest) {
   const messageId = cq.message?.message_id;
 
   if (action === "regen") {
+    getPostHogClient().capture({
+      distinctId: "system",
+      event: "telegram_review_action",
+      properties: { action, draft_id: draftId },
+    });
     await tg("answerCallbackQuery", { callback_query_id: cq.id, text: "جارٍ إعادة التوليد…" });
     after(async () => {
       const r = await buildDailyIssue();
@@ -48,6 +54,11 @@ export async function POST(req: NextRequest) {
   }
 
   const result = await handleReviewAction(action, draftId);
+  getPostHogClient().capture({
+    distinctId: "system",
+    event: "telegram_review_action",
+    properties: { action, draft_id: draftId },
+  });
   // Telegram acknowledgements are best-effort — never fail the action over them.
   try {
     await tg("answerCallbackQuery", { callback_query_id: cq.id, text: result.slice(0, 200) });

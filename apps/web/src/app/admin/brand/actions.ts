@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getPostHogClient } from "@/lib/posthog";
 
 export type BrandFormState = { ok: boolean; error?: string };
 
@@ -36,6 +37,13 @@ export async function updateBrand(
     .eq("singleton", true);
 
   if (error) return { ok: false, error: error.message };
+
+  const { data: { user } } = await supabase.auth.getUser();
+  getPostHogClient().capture({
+    distinctId: user?.id ?? "system",
+    event: "brand_updated",
+    properties: { brand_name: payload.name, banned_word_count: payload.banned_words.length },
+  });
 
   revalidatePath("/admin/brand");
   revalidatePath("/admin");

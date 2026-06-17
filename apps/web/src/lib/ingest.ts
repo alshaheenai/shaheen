@@ -3,6 +3,7 @@ import crypto from "crypto";
 import Parser from "rss-parser";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { TablesInsert } from "@/lib/database.types";
+import { getPostHogClient } from "@/lib/posthog";
 
 const parser = new Parser({
   timeout: 15000,
@@ -91,6 +92,17 @@ export async function ingestRssSources(): Promise<IngestResult> {
       });
     }
   }
+
+  getPostHogClient().capture({
+    distinctId: "system",
+    event: "rss_ingest_completed",
+    properties: {
+      sources: result.sources,
+      inserted: result.inserted,
+      skipped: result.skipped,
+      error_count: result.errors.length,
+    },
+  });
 
   return result;
 }

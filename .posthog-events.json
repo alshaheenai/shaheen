@@ -1,0 +1,67 @@
+[
+  {
+    "event": "user_signed_in",
+    "description": "User successfully authenticated via magic link (PKCE callback succeeded)",
+    "file": "apps/web/src/app/auth/callback/route.ts"
+  },
+  {
+    "event": "user_signed_out",
+    "description": "User signed out of the admin panel",
+    "file": "apps/web/src/app/auth/signout/route.ts"
+  },
+  {
+    "event": "pipeline_run_started",
+    "description": "Daily issue build pipeline was triggered and started running",
+    "file": "apps/web/src/lib/pipeline/run.ts"
+  },
+  {
+    "event": "pipeline_run_completed",
+    "description": "Daily issue pipeline completed successfully, producing a draft",
+    "file": "apps/web/src/lib/pipeline/run.ts"
+  },
+  {
+    "event": "pipeline_run_failed",
+    "description": "Daily issue pipeline failed with an error",
+    "file": "apps/web/src/lib/pipeline/run.ts"
+  },
+  {
+    "event": "rss_ingest_completed",
+    "description": "RSS ingest job finished fetching and inserting items from all active sources",
+    "file": "apps/web/src/lib/ingest.ts"
+  },
+  {
+    "event": "draft_sent_for_review",
+    "description": "A draft issue was sent to the admin's Telegram for review",
+    "file": "apps/web/src/app/api/cron/send-review/route.ts"
+  },
+  {
+    "event": "telegram_review_action",
+    "description": "Admin took an action on a draft via Telegram (approve, reject, or regenerate)",
+    "file": "apps/web/src/app/api/telegram/webhook/route.ts"
+  },
+  {
+    "event": "source_created",
+    "description": "Admin added a new content source",
+    "file": "apps/web/src/app/admin/sources/actions.ts"
+  },
+  {
+    "event": "source_deleted",
+    "description": "Admin deleted a content source",
+    "file": "apps/web/src/app/admin/sources/actions.ts"
+  },
+  {
+    "event": "source_toggled",
+    "description": "Admin enabled or disabled a content source",
+    "file": "apps/web/src/app/admin/sources/actions.ts"
+  },
+  {
+    "event": "brand_updated",
+    "description": "Admin updated brand configuration (name, tone, banned words, colors)",
+    "file": "apps/web/src/app/admin/brand/actions.ts"
+  },
+  {
+    "event": "model_updated",
+    "description": "Admin changed the AI model assigned to a pipeline task",
+    "file": "apps/web/src/app/admin/models/actions.ts"
+  }
+]

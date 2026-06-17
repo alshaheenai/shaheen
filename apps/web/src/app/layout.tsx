@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans_Arabic } from "next/font/google";
+import localFont from "next/font/local";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const arabic = IBM_Plex_Sans_Arabic({
+// Thmanyah Sans — the project's adopted typeface (local woff2).
+const arabic = localFont({
   variable: "--font-arabic",
-  subsets: ["arabic", "latin"],
-  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  src: [
+    { path: "../fonts/thmanyah/thmanyahsans-Light.woff2", weight: "300", style: "normal" },
+    { path: "../fonts/thmanyah/thmanyahsans-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/thmanyah/thmanyahsans-Medium.woff2", weight: "500", style: "normal" },
+    { path: "../fonts/thmanyah/thmanyahsans-Bold.woff2", weight: "700", style: "normal" },
+    { path: "../fonts/thmanyah/thmanyahsans-Black.woff2", weight: "900", style: "normal" },
+  ],
 });
 
 const brandName = process.env.NEXT_PUBLIC_BRAND_NAME ?? "الشاهين";

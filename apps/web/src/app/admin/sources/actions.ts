@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getPostHogClient } from "@/lib/posthog";
 
 export type SourceFormState = { ok: boolean; error?: string };
 
@@ -30,6 +31,12 @@ export async function createSource(
   });
 
   if (error) return { ok: false, error: error.message };
+  const { data: { user } } = await supabase.auth.getUser();
+  getPostHogClient().capture({
+    distinctId: user?.id ?? "system",
+    event: "source_created",
+    properties: { source_name: name, source_type: type, url: url || null },
+  });
   revalidatePath("/admin/sources");
   return { ok: true };
 }
@@ -37,11 +44,23 @@ export async function createSource(
 export async function toggleSource(id: string, active: boolean) {
   const supabase = await createClient();
   await supabase.from("sources").update({ active }).eq("id", id);
+  const { data: { user } } = await supabase.auth.getUser();
+  getPostHogClient().capture({
+    distinctId: user?.id ?? "system",
+    event: "source_toggled",
+    properties: { source_id: id, active },
+  });
   revalidatePath("/admin/sources");
 }
 
 export async function deleteSource(id: string) {
   const supabase = await createClient();
   await supabase.from("sources").delete().eq("id", id);
+  const { data: { user } } = await supabase.auth.getUser();
+  getPostHogClient().capture({
+    distinctId: user?.id ?? "system",
+    event: "source_deleted",
+    properties: { source_id: id },
+  });
   revalidatePath("/admin/sources");
 }
