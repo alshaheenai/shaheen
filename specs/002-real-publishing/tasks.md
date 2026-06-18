@@ -102,13 +102,13 @@ description: "Task list for Phase 7 — Real Publishing"
 - [ ] T029 [P] Update `.env.example` comments for `NEXT_PUBLIC_SITE_URL` and confirm Resend/Telegram-channel vars are documented.
 - [ ] T030 Run the `quickstart.md` scenarios end-to-end on `pnpm dev` (Scenarios 1–5) and record results.
 - [ ] T031 [P] Update `docs/HANDOFF.md` (mark Phase 7 done: email+blog+Telegram; X deferred) and project memory.
-- [ ] T032 [P] Seed/enable `publishing_channels` rows: `blog` (enabled), `telegram` (enabled, `config.channel_id=@AlShaheenAi`). (`email` enabled only after T040.)
+- [~] T032 [P] Seed/enable `publishing_channels` rows: `telegram` (enabled, `config.channel_id=@AlShaheenAi`) ✅ done; `blog` is always-on in code; `email` row pending the newsletter-send increment.
 
 **⛔ GATED — require explicit user go-ahead (irreversible / outward-facing):**
 
-- [ ] T040 ⛔ Apply migration `0001_phase7_subscribers.sql` to the **production** Supabase project (`tciiwpzkgtsoypuaghld`) via Supabase MCP `apply_migration` or SQL Editor.
-- [ ] T041 ⛔ Verify the Resend sending domain `alshaheenai.com`: add the domain in Resend, add the returned SPF/DKIM/DMARC records via the **Cloudflare MCP**, confirm verification; then enable the `email` channel row.
-- [ ] T042 ⛔ Real-email validation: with the **only** active subscriber being a test address (never a real list), run an email publish and confirm receipt + unsubscribe.
+- [x] T040 ⛔ Applied migration `phase7_subscribers_double_optin` to prod (`tciiwpzkgtsoypuaghld`) via Supabase MCP `apply_migration` (user-approved 2026-06-18). Verified: `confirmation_token`/`unsubscribe_token` columns added, `status` default → `pending`.
+- [x] T041 ⛔ Resend domain `alshaheenai.com` verified (by user, via Cloudflare). Confirmed live: a real send from `news@alshaheenai.com` reached `last_event: delivered`.
+- [~] T042 ⛔ Single confirmation email delivered to `alshaheendaily@gmail.com` (user pre-approved; sent directly via Resend since dev was down; Resend id `b124dffc…`, `delivered`). Full publish-path email validation + unsubscribe round-trip still pending (needs a running app). **The newsletter blast (T023) remains unbuilt and ungated.**
 
 ---
 
