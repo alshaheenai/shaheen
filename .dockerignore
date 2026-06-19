@@ -1,0 +1,28 @@
+# Build context is the repo root. Keep it lean and secret-free.
+**/node_modules
+**/.next
+.git
+.gitignore
+
+# secrets — never into the image
+.env
+.env.local
+**/.env
+**/.env.local
+*.env.local
+
+# logs / os / scratch
+**/*.log
+.DS_Store
+**/.turbo
+.vercel
+coverage
+
+# not needed to build/run the app
+infra
+specs
+docs
+.specify
+.claude
+.agents
+.firecrawl

@@ -37,7 +37,13 @@
 
 ## المتبقّي
 - **متبقّي من Phase 7:** `T023` — **النشرة الجماعية** (`lib/publish/email.ts`: إرسال دفعات Resend لكل المشتركين الفعّالين + List-Unsubscribe + idempotency). **لم تُبنَ بعد، وموقوفة (gated)** حتى إذن صريح.
-- **التالي — Phase 10: النشر على VPS** (Contabo، `109.199.111.27`, Ubuntu 24.04؛ السيرفر جاهز الآن) + جدولة cron تدقّ نقاط النهاية (جمع 11م / بناء 12ص / مراجعة 12:30 / نشر 3ص) + نسخ احتياطي. الأفضل البدء هنا لأن `pnpm dev` غير مستقر محلياً.
+- **Phase 10 — النشر على VPS: ملفات النشر جاهزة ✅** (Contabo، `109.199.111.27`, Ubuntu 24.04). أُنشئت ولم تُشغَّل بعد (البناء على السيرفر):
+  - `apps/web/next.config.ts` → `output:"standalone"` (+ `outputFileTracingRoot` للـ monorepo).
+  - `apps/web/Dockerfile` متعدد المراحل (deps→build→runner `node:22-slim`) + `.dockerignore` (الجذر). **سياق البناء = جذر الريبو** (لازم للـ pnpm workspace lockfile)؛ compose يبني بـ `context: ..` و`dockerfile: apps/web/Dockerfile`. الـ `NEXT_PUBLIC_*` (عامة، ليست أسراراً) تُمرَّر كـ build args.
+  - `infra/docker-compose.yml`: خدمتا `app` (expose 3000 داخلياً) + `caddy` (80/443). **الأسرار في `infra/.env` على السيرفر فقط (gitignored)** — يستعمله compose للـ build args وللـ runtime env_file.
+  - `infra/Caddyfile`: `alshaheenai.com → reverse_proxy app:3000` (HTTPS تلقائي) + `www` يحوّل للجذر. **يتطلب DNS-only (سحابة Cloudflare رمادية)** ليُكمل Caddy تحدّي ACME.
+  - `infra/crontab.example`: مهام بتوقيت الرياض (CRON_TZ) — جمع 23:00 · بناء 00:00 · مراجعة 00:30 · نشر 03:00 — تقرأ `INGEST_SECRET` من `infra/.env` وقت التنفيذ (لا أسرار في الملف).
+  - **خطوات النشر على السيرفر:** انسخ الريبو → أنشئ `infra/.env` (من `.env.example` + قيم `NEXT_PUBLIC_*`) → `cd infra && docker compose up -d --build` → ثبّت Caddy DNS-only → `crontab infra/crontab.example` (بعد ضبط المسار) → نسخ احتياطي.
 - **بقية المراحل:** 4) الهدايا (غنيمة اليوم) · 6) صور nano-banana (عبر OpenRouter) · 8) الموجز الأسبوعي · 9) التحليلات + روابط تقييم القرّاء + ربط Sentry.
 - **مؤجّلات المحرك:** dedup دلالي · عقدة تحقّق · مصدر The Neuron · X (مؤجّلة — تحتاج طبقة API مدفوعة ~$100+/شهر).
 
@@ -49,4 +55,4 @@
 ## طريقة العمل (Spec Kit) — بالترتيب لكل عمل جديد
 الدستور والمواصفات الأساسية جاهزة. لأي ميزة/مرحلة جديدة: `/speckit.specify` → `/speckit.clarify` → `/speckit.plan` → `/speckit.tasks` → `/speckit.implement`، مع اختبار حيّ قبل الاعتماد، وإيقاف عند الخطوات الحسّاسة (هجرات إنتاج، إرسال حقيقي، DNS، نشر عام) لإذن المستخدم خطوة بخطوة.
 
-**ابدأ التالي:** Phase 10 (نشر VPS) — أو إنهاء `T023` (النشرة الجماعية) بإذن صريح.
+**ابدأ التالي:** نفّذ النشر على السيرفر (ملفات Phase 10 جاهزة، انظر خطوات النشر أعلاه) — أو إنهاء `T023` (النشرة الجماعية) بإذن صريح.
