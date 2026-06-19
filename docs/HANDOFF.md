@@ -8,7 +8,7 @@
 `CLAUDE.md` · `AGENTS.md` · **الدستور `.specify/memory/constitution.md` (v1.0.0)** · المواصفات في `specs/` (انظر أدناه) · `docs/brand-identity.md` · ذاكرة المشروع (project-marsad / marsad-phase-plan / brand-identity) · `supabase/setup.sql`.
 
 ## المشروع
-«الشاهين» نشرة ذكاء اصطناعي يومية عربية لروّاد الأعمال الخليجيين. المنطق كله في `apps/web` (Next.js 16). ريبو: junkpro518/shaheen. مسار: ~/Documents/Proj/0_0. التركيز التحريري: «AI → فرصة/أداة/مشروع لرائد الأعمال» (بوابة relevance في المحرك).
+«الشاهين» نشرة ذكاء اصطناعي يومية عربية لروّاد الأعمال الخليجيين. المنطق كله في `apps/web` (Next.js 16). ريبو: alshaheenai/shaheen. مسار: ~/Documents/Proj/0_0. التركيز التحريري: «AI → فرصة/أداة/مشروع لرائد الأعمال» (بوابة relevance في المحرك).
 
 ## المبني والشغّال (Phases 1–3 · 5 · 7)
 - جمع RSS → `raw_items` بمنع تكرار: `lib/ingest.ts` + `/api/cron/ingest`

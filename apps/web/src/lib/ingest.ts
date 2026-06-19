@@ -8,7 +8,7 @@ import { getPostHogClient } from "@/lib/posthog";
 const parser = new Parser({
   timeout: 15000,
   headers: {
-    "User-Agent": "ShaheenBot/0.1 (+https://github.com/junkpro518/shaheen)",
+    "User-Agent": "ShaheenBot/0.1 (+https://github.com/alshaheenai/shaheen)",
   },
 });
 
