@@ -31,12 +31,12 @@ export async function publishTelegramChannel(issue: Tables<"published_issues">):
 
   const body = (issue.body ?? {}) as unknown as IssueBody;
   const url = await issueUrl(issue.slug);
-  const title = issue.title ?? "عدد الشاهين";
+  const title = issue.title ?? "نشرة الشاهين";
   const bullets = (body.tldr_bullets ?? []).slice(0, 3).map((b) => clipWords(b, 160));
 
   const parts: string[] = [`👁️ <b>${esc(title)}</b>`];
   if (bullets.length) parts.push(bullets.map((b) => `• ${esc(b)}`).join("\n"));
-  parts.push(`\n📖 اقرأ العدد كاملاً:\n${esc(url)}`);
+  parts.push(`\n📖 اقرأ النشرة كاملة:\n${esc(url)}`);
   const text = parts.join("\n");
 
   const res = await tg("sendMessage", {

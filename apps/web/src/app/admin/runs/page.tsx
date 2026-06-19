@@ -49,7 +49,7 @@ export default async function RunsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">تشغيلات النظام والاستهلاك</h1>
-        <p className="text-muted-foreground">كل مرة يبني فيها المحرك عدداً: التوكنات المصروفة والتكلفة.</p>
+        <p className="text-muted-foreground">كل مرة يبني فيها المحرك نشرة: التوكنات المصروفة والتكلفة.</p>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
@@ -71,7 +71,7 @@ export default async function RunsPage() {
               <TableHead className="text-right">استدعاءات</TableHead>
               <TableHead className="text-right">التكلفة</TableHead>
               <TableHead className="text-right">المدة</TableHead>
-              <TableHead className="text-right">العدد</TableHead>
+              <TableHead className="text-right">النشرة</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

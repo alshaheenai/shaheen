@@ -23,9 +23,9 @@ async function getIssue(slug: string) {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const issue = await getIssue(slug);
-  if (!issue) return { title: "العدد غير متاح" };
+  if (!issue) return { title: "النشرة غير متاحة" };
   const body = (issue.body ?? {}) as unknown as IssueBody;
-  const title = issue.title ?? "عدد الشاهين";
+  const title = issue.title ?? "نشرة الشاهين";
   const description = body.tldr_bullets?.slice(0, 2).join(" · ") || undefined;
   return {
     title,
@@ -51,7 +51,7 @@ export default async function IssuePage({ params }: Params) {
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
       <header className="mb-8 border-b pb-6">
         {issue.issue_date && <p className="mb-1 text-sm text-muted-foreground">{issue.issue_date}</p>}
-        <h1 className="text-3xl font-bold">{issue.title ?? "عدد الشاهين"}</h1>
+        <h1 className="text-3xl font-bold">{issue.title ?? "نشرة الشاهين"}</h1>
       </header>
 
       <IssueView
@@ -62,7 +62,7 @@ export default async function IssuePage({ params }: Params) {
 
       <footer className="mt-10 border-t pt-6 text-sm">
         <Link href="/issues" className="underline">
-          كل الأعداد
+          كل النشرات
         </Link>
       </footer>
     </main>

@@ -58,7 +58,7 @@ ${list}
 // ── main story full treatment ──
 export function mainStoryPrompt(b: BrandVoice, item: Candidate, summary: string) {
   const system = `${voiceHeader(b)}
-أنت تكتب «الانقضاضة» — الخبر الرئيسي لعدد اليوم. أعد JSON فقط.`;
+أنت تكتب «الانقضاضة» — الخبر الرئيسي لنشرة اليوم. أعد JSON فقط.`;
   const user = `الخبر الرئيسي:
 العنوان: ${item.title}
 المحتوى: ${(item.content || summary).slice(0, 2500)}
@@ -104,7 +104,7 @@ ${list}
 // ── headline + intro + TL;DR ──
 export function headlinePrompt(b: BrandVoice, scored: Scored[]) {
   const system = `${voiceHeader(b)}
-أنت تكتب رأس العدد: عنوان، افتتاحية «${b.name} يرصد لك اليوم…»، وملخص «نظرة الشاهين» (٥ نقاط). أعد JSON فقط.`;
+أنت تكتب رأس النشرة: عنوان، افتتاحية «${b.name} يرصد لك اليوم…»، وملخص «نظرة الشاهين» (٥ نقاط). أعد JSON فقط.`;
   const list = scored
     .slice(0, 12)
     .map((s) => `- ${s.summary}`)
@@ -113,7 +113,7 @@ export function headlinePrompt(b: BrandVoice, scored: Scored[]) {
 ${list}
 
 أعطِ:
-- title: عنوان جذّاب موجز لعدد اليوم
+- title: عنوان جذّاب موجز لنشرة اليوم
 - intro: افتتاحية قصيرة (٢-٣ جمل) تبدأ بروح «${b.name} يرصد لك اليوم…» وتربط خيط اليوم
 - main_topic: الموضوع المحوري لليوم بكلمتين أو ثلاث
 - tldr_bullets: مصفوفة من ٥ نقاط قصيرة جداً «وش صار اليوم» (كل نقطة سطر)

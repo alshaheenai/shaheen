@@ -5,7 +5,7 @@ import type { IssueBody } from "@/lib/pipeline/types";
 
 export const revalidate = 300;
 
-export const metadata = { title: "كل الأعداد" };
+export const metadata = { title: "كل النشرات" };
 
 export default async function IssuesArchive() {
   const supabase = await createClient();
@@ -25,9 +25,9 @@ export default async function IssuesArchive() {
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
-      <h1 className="mb-8 text-3xl font-bold">{name} — كل الأعداد</h1>
+      <h1 className="mb-8 text-3xl font-bold">{name} — كل النشرات</h1>
       {issues.length === 0 ? (
-        <p className="text-muted-foreground">لا توجد أعداد منشورة بعد.</p>
+        <p className="text-muted-foreground">لا توجد نشرات منشورة بعد.</p>
       ) : (
         <ul className="space-y-6">
           {issues.map((i) => {
@@ -36,7 +36,7 @@ export default async function IssuesArchive() {
             return (
               <li key={i.slug} className="border-b pb-4">
                 <Link href={`/issues/${i.slug}`} className="text-xl font-semibold underline">
-                  {i.title ?? "عدد الشاهين"}
+                  {i.title ?? "نشرة الشاهين"}
                 </Link>
                 {i.issue_date && <p className="mt-1 text-sm text-muted-foreground">{i.issue_date}</p>}
                 {teaser && <p className="mt-2 text-muted-foreground">{teaser}</p>}

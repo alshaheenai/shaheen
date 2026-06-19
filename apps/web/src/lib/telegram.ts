@@ -29,7 +29,7 @@ function clip(s: string, n: number): string {
 export function formatReview(draft: Tables<"draft_issues">): string {
   const b = (draft.body ?? {}) as unknown as IssueBody;
   const parts: string[] = [];
-  parts.push(`👁️ <b>${esc(draft.title ?? "عدد اليوم")}</b>`);
+  parts.push(`👁️ <b>${esc(draft.title ?? "نشرة اليوم")}</b>`);
   if (draft.intro) parts.push(esc(clip(draft.intro, 400)));
 
   if (b.tldr_bullets?.length) {
@@ -84,7 +84,7 @@ export async function sourcesReport(draft: Tables<"draft_issues">): Promise<stri
     ...(b.tools ?? []).map((t) => t.news_id),
   ].filter(Boolean) as string[];
 
-  const lines: string[] = ["📊 <b>تقرير العدد</b>"];
+  const lines: string[] = ["📊 <b>تقرير النشرة</b>"];
 
   if (meta.run_id) {
     const { data: run } = await supabase
@@ -129,7 +129,7 @@ export async function handleReviewAction(action: string, draftId: string): Promi
     .select("*")
     .eq("id", draftId)
     .maybeSingle();
-  if (!draft) return "لم يُعثر على العدد.";
+  if (!draft) return "لم يُعثر على النشرة.";
 
   switch (action) {
     case "publish": {
@@ -146,14 +146,14 @@ export async function handleReviewAction(action: string, draftId: string): Promi
         },
         { onConflict: "slug", ignoreDuplicates: true }
       );
-      return "✅ اعتُمد العدد ونُسخ للأرشيف. توزيع القنوات (بريد/قناة/واتساب/X) يأتي في Phase 7.";
+      return "✅ اعتُمدت النشرة ونُسخت للأرشيف. توزيع القنوات (بريد/قناة/واتساب/X) يأتي في Phase 7.";
     }
     case "reject":
       await supabase.from("draft_issues").update({ status: "rejected" }).eq("id", draftId);
-      return "❌ رُفض العدد.";
+      return "❌ رُفضت النشرة.";
     case "postpone":
       await supabase.from("draft_issues").update({ status: "postponed" }).eq("id", draftId);
-      return "⏰ أُجّل العدد.";
+      return "⏰ أُجّلت النشرة.";
     case "stop":
       await supabase
         .from("draft_issues")

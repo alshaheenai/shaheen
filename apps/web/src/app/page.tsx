@@ -17,7 +17,7 @@ export default async function Home() {
           اشترك
         </Link>
         <Link href="/issues" className={buttonVariants({ variant: "outline" })}>
-          كل الأعداد
+          كل النشرات
         </Link>
         <Link href="/admin" className={buttonVariants({ variant: "outline" })}>
           لوحة التحكم

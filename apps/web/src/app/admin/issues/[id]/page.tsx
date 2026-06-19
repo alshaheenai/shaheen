@@ -41,7 +41,7 @@ export default async function IssueDetail({ params }: { params: Promise<{ id: st
     <div className="mx-auto max-w-3xl space-y-8">
       <div className="space-y-2 border-b pb-4">
         <Link href="/admin/issues" className="text-sm text-muted-foreground hover:underline">
-          ← كل الأعداد
+          ← كل النشرات
         </Link>
         <h1 className="text-3xl font-bold">{issue.title}</h1>
         {issue.intro && <p className="text-lg text-muted-foreground">{issue.intro}</p>}

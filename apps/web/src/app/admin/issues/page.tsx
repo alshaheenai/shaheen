@@ -30,12 +30,12 @@ export default async function IssuesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">الأعداد (مسودات)</h1>
-        <p className="text-muted-foreground">المسودات التي ولّدها المحرك. افتح عدداً لمعاينته بهوية الشاهين.</p>
+        <h1 className="text-2xl font-bold">النشرات (مسودات)</h1>
+        <p className="text-muted-foreground">المسودات التي ولّدها المحرك. افتح نشرة لمعاينتها بهوية الشاهين.</p>
       </div>
 
       {!issues || issues.length === 0 ? (
-        <p className="text-sm text-muted-foreground">لا توجد مسودات بعد. شغّل المحرك لتوليد عدد.</p>
+        <p className="text-sm text-muted-foreground">لا توجد مسودات بعد. شغّل المحرك لتوليد نشرة.</p>
       ) : (
         <Table>
           <TableHeader>

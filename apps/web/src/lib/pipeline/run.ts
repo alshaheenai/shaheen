@@ -291,7 +291,7 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
       .insert({
         issue_date: today,
         type: "daily",
-        title: head.title ?? "عدد اليوم",
+        title: head.title ?? "نشرة اليوم",
         intro: head.intro ?? "",
         main_topic: head.main_topic ?? "",
         body: body as unknown as Json,
