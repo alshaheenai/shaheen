@@ -142,6 +142,10 @@ Tool-specific instructions may differ when necessary.
 
 When changing one file, review the other file and update any shared rules so both agents follow the same project standards.
 
+## Code Style (UI)
+
+- **UI / shadcn on @base-ui** (style: base-nova): use `@base-ui/react` primitives for accessibility + behavior. The `Button` has **no `asChild`** — use `buttonVariants()` on a `<Link>`/`<a>` instead. **Do not introduce Radix.**
+
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.

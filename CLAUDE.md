@@ -43,6 +43,7 @@ Key modules:
 - The official Supabase project (`tciiwpzkgtsoypuaghld`, eu-central-1) is under a **different account** than the originally-connected MCP token — apply DDL via the Management API + a PAT, the SQL Editor, or the `supabase` MCP in `.mcp.json` after OAuth.
 - All secrets in `apps/web/.env.local` (gitignored; documented in `.env.example`). Rotate before production.
 - Observability: PostHog via `lib/posthog.ts` (`getPostHogClient()`), captured across server actions/routes; Sentry DSN in env.
+- **UI / shadcn on @base-ui** (style: base-nova): use `@base-ui/react` primitives for accessibility + behavior. The `Button` has **no `asChild`** — use `buttonVariants()` on a `<Link>`/`<a>` instead. **Do not introduce Radix.**
 
 ## Status
 
