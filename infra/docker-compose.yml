@@ -21,6 +21,20 @@ services:
       - "traefik.http.routers.shaheen.tls.certresolver=myresolver"
       - "traefik.http.routers.shaheen.service=shaheen"
       - "traefik.http.services.shaheen.loadbalancer.server.port=3000"
+      - "traefik.http.routers.shaheen-www.rule=Host(`www.alshaheenai.com`)"
+      - "traefik.http.routers.shaheen-www.entrypoints=websecure"
+      - "traefik.http.routers.shaheen-www.tls.certresolver=myresolver"
+      - "traefik.http.routers.shaheen-www.service=shaheen"
+      - "traefik.http.routers.shaheen-www.middlewares=shaheen-www-redirect"
+      - "traefik.http.middlewares.shaheen-www-redirect.redirectregex.regex=^https?://www\\.alshaheenai\\.com/(.*)"
+      - "traefik.http.middlewares.shaheen-www-redirect.redirectregex.replacement=https://alshaheenai.com/$${1}"
+      - "traefik.http.middlewares.shaheen-www-redirect.redirectregex.permanent=true"
+      - "traefik.http.routers.shaheen-http.rule=Host(`alshaheenai.com`) || Host(`www.alshaheenai.com`)"
+      - "traefik.http.routers.shaheen-http.entrypoints=web"
+      - "traefik.http.routers.shaheen-http.service=shaheen"
+      - "traefik.http.routers.shaheen-http.middlewares=shaheen-https-redirect"
+      - "traefik.http.middlewares.shaheen-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.shaheen-https-redirect.redirectscheme.permanent=true"
 
 networks:
   proxy:
