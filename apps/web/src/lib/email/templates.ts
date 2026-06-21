@@ -42,21 +42,15 @@ export function confirmationEmailHtml(args: {
           <tr><td style="height:4px;background:${gold};font-size:0;line-height:0;">&nbsp;</td></tr>
           <!-- body -->
           <tr>
-            <td dir="rtl" style="padding:38px 32px 12px;font-family:${font};color:${navy};text-align:right;">
+            <td dir="rtl" style="padding:38px 32px 12px;font-family:${font};color:${navy};text-align:center;">
               <h1 style="margin:0 0 14px;font-size:22px;font-weight:700;color:${navy};">أهلاً بك في سرب ${name}</h1>
               <p style="margin:0 0 30px;font-size:16px;line-height:1.9;color:#3a4757;">شكراً لانضمامك لسرب ${name} — أكّد بريدك لتبدأ باستلام النشرة.</p>
-              <table role="presentation" cellpadding="0" cellspacing="0" align="right">
-                <tr>
-                  <td style="border-radius:10px;background:${gold};">
-                    <a href="${url}" style="display:inline-block;padding:15px 40px;font-family:${font};font-size:16px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;">تأكيد الاشتراك</a>
-                  </td>
-                </tr>
-              </table>
+              <a href="${url}" style="display:inline-block;background:${gold};padding:15px 40px;font-family:${font};font-size:16px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;">تأكيد الاشتراك</a>
             </td>
           </tr>
           <!-- fallback link -->
           <tr>
-            <td dir="rtl" style="padding:26px 32px 32px;font-family:${font};text-align:right;">
+            <td dir="rtl" style="padding:26px 32px 32px;font-family:${font};text-align:center;">
               <p style="margin:0;font-size:12px;line-height:1.8;color:#8a8475;">إن لم يعمل الزر، انسخ هذا الرابط في المتصفح:<br><span style="color:#1E6FB8;word-break:break-all;">${url}</span></p>
             </td>
           </tr>
