@@ -17,7 +17,7 @@ export default async function SubscribePage({
       <p className="mb-6 text-muted-foreground">الذكاء الاصطناعي لروّاد الأعمال — يومياً في بريدك.</p>
 
       {sp.confirmed ? (
-        <p className="rounded-md bg-muted p-4 leading-relaxed">✅ تم تأكيد اشتراكك. أهلاً بك في {name}.</p>
+        <p className="rounded-md bg-muted p-4 leading-relaxed">✅ تم تأكيد اشتراكك. أهلاً بك في سرب {name}.</p>
       ) : sp.error ? (
         <p className="rounded-md bg-muted p-4 leading-relaxed">
           ⚠️ رابط التأكيد غير صالح أو منتهٍ. جرّب الاشتراك من جديد.
