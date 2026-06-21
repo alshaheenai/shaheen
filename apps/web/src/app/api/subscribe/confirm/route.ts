@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { confirmSubscriber } from "@/lib/subscribers";
+import { originFromRequest } from "@/lib/site";
 
 export const runtime = "nodejs";
 
@@ -7,6 +8,6 @@ export const runtime = "nodejs";
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token") ?? "";
   const ok = token ? await confirmSubscriber(token) : false;
-  const dest = new URL(`/subscribe?${ok ? "confirmed=1" : "error=invalid"}`, request.nextUrl.origin);
-  return NextResponse.redirect(dest);
+  const base = originFromRequest(request);
+  return NextResponse.redirect(`${base}/subscribe?${ok ? "confirmed=1" : "error=invalid"}`);
 }

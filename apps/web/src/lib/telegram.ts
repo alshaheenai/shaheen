@@ -160,8 +160,10 @@ export async function handleReviewAction(action: string, draftId: string): Promi
         .update({ status: "rejected", meta: { ...(draft.meta as object), stopped: true } })
         .eq("id", draftId);
       return "⛔️ أُوقف نشر اليوم.";
-    case "edit":
-      return `✏️ للتعديل من اللوحة:\n/admin/issues/${draftId}`;
+    case "edit": {
+      const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/+$/, "") || "https://alshaheenai.com";
+      return `✏️ للتعديل من اللوحة:\n${base}/admin/issues/${draftId}`;
+    }
     default:
       return "إجراء غير معروف.";
   }
