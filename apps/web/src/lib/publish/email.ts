@@ -88,7 +88,10 @@ export async function publishEmail(
             "List-Unsubscribe": `<${unsubscribeUrl}>`,
             "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
           },
-          idempotencyKey: `issue-${issue.id}-${r.email}`,
+          // Real sends use a stable key (issue+email) to prevent duplicates. Test
+          // previews omit it so the admin can re-preview the same issue after editing
+          // the template without Resend returning 409 (same key, changed payload).
+          idempotencyKey: opts.test ? undefined : `issue-${issue.id}-${r.email}`,
         });
         await supabase.from("email_sends").upsert(
           { published_issue_id: issue.id, email: r.email, status: "sent", resend_id: res.id ?? null, sent_at: new Date().toISOString() },
