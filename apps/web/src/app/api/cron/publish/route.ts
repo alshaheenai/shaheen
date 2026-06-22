@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
     issueId?: string;
     channels?: string[];
     force?: boolean;
+    test?: boolean;
   };
 
   let targetId = body.issueId;
@@ -38,6 +39,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "no ready issue in last 36h" }, { status: 404 });
     }
     targetId = data.id;
+  }
+
+  // Admin preview: email-only test send (does not persist channel_results).
+  if (body.test) {
+    const outcome = await publishIssue(targetId, { test: true, channels: ["email"], force: body.force });
+    return NextResponse.json(outcome);
   }
 
   const outcome = await publishIssue(targetId, { channels: body.channels, force: body.force });

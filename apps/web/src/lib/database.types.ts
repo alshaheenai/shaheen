@@ -60,6 +60,12 @@ export type Database = {
         Update: { ad_id?: string | null; body?: Json; channel_variants?: Json; cover_image_url?: string | null; created_at?: string; gift_id?: string | null; id?: string; intro?: string | null; issue_date?: string | null; main_topic?: string | null; meta?: Json; status?: string; title?: string | null; type?: string; updated_at?: string }
         Relationships: []
       }
+      email_sends: {
+        Row: { id: string; published_issue_id: string; email: string; status: string; resend_id: string | null; sent_at: string }
+        Insert: { id?: string; published_issue_id: string; email: string; status?: string; resend_id?: string | null; sent_at?: string }
+        Update: { id?: string; published_issue_id?: string; email?: string; status?: string; resend_id?: string | null; sent_at?: string }
+        Relationships: []
+      }
       errors_log: {
         Row: { created_at: string; detail: Json; id: string; level: string; message: string | null; source: string | null }
         Insert: { created_at?: string; detail?: Json; id?: string; level?: string; message?: string | null; source?: string | null }
