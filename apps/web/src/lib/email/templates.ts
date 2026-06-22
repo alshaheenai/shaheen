@@ -74,7 +74,7 @@ export function confirmationEmailHtml(args: {
 // Full daily-issue newsletter email. Brand identity, RTL, inline CSS, responsive.
 export function issueEmailHtml(args: {
   brandName: string;
-  issue: { title: string | null; intro?: string | null; body: IssueBody };
+  issue: { title: string | null; issue_date?: string | null; intro?: string | null; body: IssueBody };
   webUrl: string;
   unsubscribeUrl: string;
 }): { subject: string; html: string } {
@@ -89,6 +89,11 @@ export function issueEmailHtml(args: {
   const b = issue.body ?? ({} as IssueBody);
   const title = issue.title?.trim() || `نشرة ${brandName}`;
   const subject = title;
+  const dateStr = issue.issue_date
+    ? new Intl.DateTimeFormat("ar-EG", { day: "numeric", month: "long", year: "numeric", calendar: "gregory" }).format(
+        new Date(`${issue.issue_date}T00:00:00`)
+      )
+    : "";
 
   const h2 = (t: string) =>
     `<h2 style="margin:30px 0 12px;font-size:18px;font-weight:800;color:${navy};border-bottom:2px solid ${gold};padding-bottom:6px;">${t}</h2>`;
@@ -157,6 +162,7 @@ export function issueEmailHtml(args: {
           <tr><td style="height:4px;background:${gold};font-size:0;line-height:0;">&nbsp;</td></tr>
           <tr>
             <td dir="rtl" style="padding:34px 32px 8px;font-family:${font};color:${navy};text-align:right;">
+              ${dateStr ? `<p style="margin:0 0 10px;font-size:13px;color:#777;">${esc(dateStr)}</p>` : ""}
               <h1 style="margin:0 0 14px;font-size:24px;font-weight:800;color:${navy};line-height:1.4;">${esc(title)}</h1>
               ${intro}
               ${tldr}

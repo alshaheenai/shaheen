@@ -75,7 +75,7 @@ export async function publishEmail(
       const unsubscribeUrl = `${base}/api/unsubscribe?token=${encodeURIComponent(token)}`;
       const { subject, html } = issueEmailHtml({
         brandName,
-        issue: { title: issue.title, intro, body },
+        issue: { title: issue.title, issue_date: issue.issue_date, intro, body },
         webUrl,
         unsubscribeUrl,
       });

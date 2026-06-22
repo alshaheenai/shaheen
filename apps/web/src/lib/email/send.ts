@@ -12,9 +12,11 @@ type SendArgs = {
 // Telegram pattern — no SDK dependency). Throws on non-2xx.
 export async function sendEmail({ to, subject, html, headers, idempotencyKey }: SendArgs): Promise<{ id?: string }> {
   const key = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM_EMAIL;
+  const fromEmail = process.env.RESEND_FROM_EMAIL;
   if (!key) throw new Error("RESEND_API_KEY not set");
-  if (!from) throw new Error("RESEND_FROM_EMAIL not set");
+  if (!fromEmail) throw new Error("RESEND_FROM_EMAIL not set");
+  // Branded display name (not a bare address) so inboxes show "الشاهين | Al Shaheen".
+  const from = `الشاهين | Al Shaheen <${fromEmail}>`;
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
