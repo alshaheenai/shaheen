@@ -7,8 +7,9 @@ export const runtime = "nodejs";
 export const maxDuration = 300;
 
 // Publish trigger. Distributes an Editor-approved (ready) issue to enabled channels.
-// Default target is TODAY'S ready issue only — it never sweeps a backlog of older
-// approved-but-undistributed issues (pass issueId explicitly for those).
+// Default target is the latest ready issue from the last 36h — covers the
+// "review at night, publish next morning" case without sweeping an old backlog
+// (limit 1 + 36h window; publish is idempotent). Pass issueId for anything older.
 // Invokable manually now; cron-driven at ~03:00 in Phase 10.
 export async function POST(request: NextRequest) {
   const secret = request.headers.get("x-ingest-secret");
@@ -25,16 +26,16 @@ export async function POST(request: NextRequest) {
   let targetId = body.issueId;
   if (!targetId) {
     const supabase = createAdminClient();
-    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+    const cutoff = new Date(Date.now() - 36 * 60 * 60 * 1000).toISOString();
     const { data } = await supabase
       .from("published_issues")
       .select("id")
-      .eq("issue_date", today)
+      .gte("published_at", cutoff)
       .order("published_at", { ascending: false })
       .limit(1)
       .maybeSingle();
     if (!data) {
-      return NextResponse.json({ error: "no ready issue for today" }, { status: 404 });
+      return NextResponse.json({ error: "no ready issue in last 36h" }, { status: 404 });
     }
     targetId = data.id;
   }
