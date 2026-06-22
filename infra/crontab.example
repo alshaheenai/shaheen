@@ -7,14 +7,14 @@
 CRON_TZ=Asia/Riyadh
 SHELL=/bin/bash
 
-# 23:00 — ingest RSS sources
-0 23 * * * IS=$(grep '^INGEST_SECRET=' /root/shaheen/infra/.env | cut -d= -f2-); curl -fsS -XPOST https://alshaheenai.com/api/cron/ingest -H "x-ingest-secret: $IS" >> /var/log/shaheen-cron.log 2>&1
+# 21:00 — ingest RSS sources
+0 21 * * * IS=$(grep '^INGEST_SECRET=' /root/shaheen/infra/.env | cut -d= -f2-); curl -fsS -XPOST https://alshaheenai.com/api/cron/ingest -H "x-ingest-secret: $IS" >> /var/log/shaheen-cron.log 2>&1
 
-# 00:00 — build today's draft issue
-0 0 * * * IS=$(grep '^INGEST_SECRET=' /root/shaheen/infra/.env | cut -d= -f2-); curl -fsS -XPOST https://alshaheenai.com/api/cron/build-issue -H "x-ingest-secret: $IS" -H "content-type: application/json" -d '{}' >> /var/log/shaheen-cron.log 2>&1
+# 21:15 — build today's draft issue
+15 21 * * * IS=$(grep '^INGEST_SECRET=' /root/shaheen/infra/.env | cut -d= -f2-); curl -fsS -XPOST https://alshaheenai.com/api/cron/build-issue -H "x-ingest-secret: $IS" -H "content-type: application/json" -d '{}' >> /var/log/shaheen-cron.log 2>&1
 
-# 00:30 — send the draft to Telegram for review
-30 0 * * * IS=$(grep '^INGEST_SECRET=' /root/shaheen/infra/.env | cut -d= -f2-); curl -fsS -XPOST https://alshaheenai.com/api/cron/send-review -H "x-ingest-secret: $IS" >> /var/log/shaheen-cron.log 2>&1
+# 21:45 — send the draft to Telegram for review
+45 21 * * * IS=$(grep '^INGEST_SECRET=' /root/shaheen/infra/.env | cut -d= -f2-); curl -fsS -XPOST https://alshaheenai.com/api/cron/send-review -H "x-ingest-secret: $IS" >> /var/log/shaheen-cron.log 2>&1
 
-# 03:00 — publish the approved issue to all enabled channels
-0 3 * * * IS=$(grep '^INGEST_SECRET=' /root/shaheen/infra/.env | cut -d= -f2-); curl -fsS -XPOST https://alshaheenai.com/api/cron/publish -H "x-ingest-secret: $IS" -H "content-type: application/json" -d '{}' >> /var/log/shaheen-cron.log 2>&1
+# 07:00 — publish the approved issue to all enabled channels
+0 7 * * * IS=$(grep '^INGEST_SECRET=' /root/shaheen/infra/.env | cut -d= -f2-); curl -fsS -XPOST https://alshaheenai.com/api/cron/publish -H "x-ingest-secret: $IS" -H "content-type: application/json" -d '{}' >> /var/log/shaheen-cron.log 2>&1
