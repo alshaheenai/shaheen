@@ -285,7 +285,12 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
     }
 
     // 7. persist draft
-    const today = new Date().toISOString().slice(0, 10);
+    // The evening build prepares TOMORROW's issue (it publishes next morning), so
+    // stamp issue_date with the next day. telegram.ts derives the slug from
+    // draft.issue_date, so it matches automatically.
+    const d = new Date();
+    d.setUTCDate(d.getUTCDate() + 1);
+    const today = d.toISOString().slice(0, 10);
     const { data: draft } = await supabase
       .from("draft_issues")
       .insert({
