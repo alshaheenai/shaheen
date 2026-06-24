@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import localFont from "next/font/local";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -33,6 +34,18 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" className={`${arabic.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">
         {children}
+        <footer className="mt-auto border-t bg-muted/30">
+          <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 px-4 py-8 text-sm text-muted-foreground">
+            <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+              <Link href="/about" className="hover:underline">من نحن</Link>
+              <Link href="/privacy" className="hover:underline">سياسة الخصوصية</Link>
+              <Link href="/contact" className="hover:underline">تواصل</Link>
+              <Link href="/issues" className="hover:underline">النشرات</Link>
+              <Link href="/subscribe" className="hover:underline">اشترك</Link>
+            </nav>
+            <p>© {brandName}</p>
+          </div>
+        </footer>
         <Toaster richColors position="top-center" />
       </body>
     </html>
