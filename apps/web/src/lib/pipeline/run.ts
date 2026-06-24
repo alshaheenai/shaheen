@@ -14,6 +14,13 @@ import type {
   BrandVoice,
 } from "./types";
 
+// The Neuron is a discovery source (competitor) — never link to their newsletter.
+// Returns null so the renderers hide the source link (original-link extraction deferred).
+function cleanSourceUrl(url: string | null | undefined): string | null {
+  if (url && url.includes("theneurondaily.com")) return null;
+  return url ?? null;
+}
+
 const CANDIDATE_LIMIT = 60;
 const BATCH = 6;
 const ROUNDUP_COUNT = 6;
@@ -206,7 +213,7 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
     });
     const mainStory: MainStory = {
       news_id: main.c.id,
-      source_url: main.c.url,
+      source_url: cleanSourceUrl(main.c.url),
       title: mainOut.title?.trim() || main.c.title,
       what: mainOut.what ?? "",
       why: mainOut.why ?? "",
@@ -231,7 +238,7 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
       const rmap = new Map((rOut.items ?? []).map((i) => [i.id, i]));
       roundupItems = roundup.map((x) => ({
         news_id: x.c.id,
-        source_url: x.c.url,
+        source_url: cleanSourceUrl(x.c.url),
         title: rmap.get(x.c.id)?.title?.trim() || x.c.title,
         blurb: rmap.get(x.c.id)?.blurb ?? x.s.summary,
       }));
@@ -252,7 +259,7 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
       const tm = new Map((tOut.items ?? []).map((i) => [i.id, i]));
       toolItems = toolPicks.map((x) => ({
         news_id: x.c.id,
-        source_url: x.c.url,
+        source_url: cleanSourceUrl(x.c.url),
         name: tm.get(x.c.id)?.name ?? x.c.title,
         blurb: tm.get(x.c.id)?.blurb ?? x.s.summary,
       }));
