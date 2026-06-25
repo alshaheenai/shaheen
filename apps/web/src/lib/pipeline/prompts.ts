@@ -65,7 +65,9 @@ ${list}
 // ── main story full treatment ──
 export function mainStoryPrompt(b: BrandVoice, item: Candidate, summary: string) {
   const system = `${voiceHeader(b)}
-أنت تكتب «الانقضاضة» — الخبر الرئيسي لنشرة اليوم. أعد JSON فقط.`;
+أنت تكتب «الانقضاضة» — الخبر الرئيسي لنشرة اليوم.
+اكتب بدقّة زمنية: لا تصف منتجاً أو حدثاً معروفاً/قديماً كأنه جديد أو صدر «اليوم/أمس/للتو»؛ إن لم تتأكد من حداثته، صِفه دون إيحاء زمني خاطئ.
+أعد JSON فقط.`;
   const user = `الخبر الرئيسي:
 العنوان: ${item.title}
 المحتوى: ${(item.content || summary).slice(0, 2500)}
@@ -87,7 +89,9 @@ export function mainStoryPrompt(b: BrandVoice, item: Candidate, summary: string)
 // ── roundup blurbs (batched) ──
 export function roundupPrompt(b: BrandVoice, items: { id: string; title: string; summary: string }[]) {
   const system = `${voiceHeader(b)}
-أنت تكتب «رفّة جناح» — جولة أخبار سريعة. لكل خبر جملة أو جملتان عربيّتان تشرحان الخبر وأهميته بإيجاز. أعد JSON فقط.`;
+أنت تكتب «رفّة جناح» — جولة أخبار سريعة. لكل خبر جملة أو جملتان عربيّتان تشرحان الخبر وأهميته بإيجاز.
+اكتب بدقّة زمنية: لا تصف منتجاً أو حدثاً معروفاً/قديماً كأنه جديد أو صدر «اليوم/أمس/للتو»؛ إن لم تتأكد من حداثته، صِفه دون إيحاء زمني خاطئ.
+أعد JSON فقط.`;
   const list = items.map((it) => `id="${it.id}" | ${it.title} — ${it.summary}`).join("\n");
   const user = `لكل خبر أعطِ عنواناً عربيّاً موجزاً (title) وفقرة قصيرة عملية (blurb، جملة أو جملتان) بنبرة النشرة:
 ${list}
@@ -111,7 +115,9 @@ ${list}
 // ── headline + intro + TL;DR ──
 export function headlinePrompt(b: BrandVoice, scored: Scored[]) {
   const system = `${voiceHeader(b)}
-أنت تكتب رأس النشرة: عنوان، افتتاحية «${b.name} يرصد لك اليوم…»، وملخص «نظرة الشاهين» (٥ نقاط). أعد JSON فقط.`;
+أنت تكتب رأس النشرة: عنوان، افتتاحية «${b.name} يرصد لك اليوم…»، وملخص «نظرة الشاهين» (٥ نقاط).
+اكتب بدقّة زمنية: لا تصف منتجاً أو حدثاً معروفاً/قديماً كأنه جديد أو صدر «اليوم/أمس/للتو»؛ إن لم تتأكد من حداثته، صِفه دون إيحاء زمني خاطئ.
+أعد JSON فقط.`;
   const list = scored
     .slice(0, 12)
     .map((s) => `- ${s.summary}`)

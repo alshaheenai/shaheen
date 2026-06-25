@@ -113,14 +113,25 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
     const processedIds = new Set((processed ?? []).map((p) => p.raw_item_id));
     const { data: raws } = await supabase
       .from("raw_items")
-      .select("id, title, content, url, source_id")
+      .select("id, title, content, url, source_id, raw")
       .order("fetched_at", { ascending: false })
       .limit(limit + processedIds.size + 50);
     const { data: sources } = await supabase.from("sources").select("id, name, trust_score");
     const srcMap = new Map((sources ?? []).map((s) => [s.id, s]));
 
+    // Drop stale items: skip any candidate whose original publish date
+    // (raw.isoDate from ingest) is older than 14 days; keep items with no isoDate.
+    const MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
     const rawCandidates: Candidate[] = (raws ?? [])
-      .filter((r) => !processedIds.has(r.id) && r.title)
+      .filter((r) => {
+        if (processedIds.has(r.id) || !r.title) return false;
+        const iso = (r.raw as { isoDate?: string } | null)?.isoDate;
+        if (iso) {
+          const t = new Date(iso).getTime();
+          if (!Number.isNaN(t) && Date.now() - t > MAX_AGE_MS) return false;
+        }
+        return true;
+      })
       .slice(0, limit)
       .map((r) => {
         const src = r.source_id ? srcMap.get(r.source_id) : undefined;
