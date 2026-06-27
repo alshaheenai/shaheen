@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { publishIssue } from "@/lib/publish/run";
+import { alertCronFailure } from "@/lib/cron-alert";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -41,19 +42,25 @@ export async function POST(request: NextRequest) {
     targetId = data.id;
   }
 
-  // Admin preview: email-only test send (does not persist channel_results).
-  if (body.test) {
-    const outcome = await publishIssue(targetId, { test: true, channels: ["email"], force: body.force });
+  try {
+    // Admin preview: email-only test send (does not persist channel_results).
+    if (body.test) {
+      const outcome = await publishIssue(targetId, { test: true, channels: ["email"], force: body.force });
+      return NextResponse.json(outcome);
+    }
+
+    const outcome = await publishIssue(targetId, { channels: body.channels, force: body.force });
+
+    // Make a freshly-published issue appear on the blog promptly.
+    if (outcome.results.blog?.status === "success") {
+      revalidatePath("/issues");
+      if (outcome.slug) revalidatePath(`/issues/${outcome.slug}`);
+    }
+
     return NextResponse.json(outcome);
+  } catch (e) {
+    await alertCronFailure("publish", e);
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
-
-  const outcome = await publishIssue(targetId, { channels: body.channels, force: body.force });
-
-  // Make a freshly-published issue appear on the blog promptly.
-  if (outcome.results.blog?.status === "success") {
-    revalidatePath("/issues");
-    if (outcome.slug) revalidatePath(`/issues/${outcome.slug}`);
-  }
-
-  return NextResponse.json(outcome);
 }

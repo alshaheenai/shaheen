@@ -5,17 +5,10 @@ import type { ChannelResult } from "@/lib/publish/types";
 import { tg } from "@/lib/telegram";
 import { getChannelConfig } from "@/lib/channels";
 import { issueUrl } from "@/lib/site";
+import { clipWords } from "@/lib/text";
 
 function esc(s: string): string {
   return (s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-// Trim to a max length on a word boundary (never mid-word), adding an ellipsis.
-function clipWords(s: string, max: number): string {
-  if (s.length <= max) return s;
-  const cut = s.slice(0, max);
-  const lastSpace = cut.lastIndexOf(" ");
-  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut) + "…";
 }
 
 // Posts a SUMMARY of the issue (headline + a few TL;DR bullets) + a link to the

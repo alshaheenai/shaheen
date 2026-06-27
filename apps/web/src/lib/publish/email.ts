@@ -8,7 +8,7 @@ import { issueEmailHtml } from "@/lib/email/templates";
 import { getBrandAdmin } from "@/lib/brand";
 import { getBaseUrl, issueUrl } from "@/lib/site";
 
-const TEST_EMAIL = "alshaheendaily@gmail.com";
+const TEST_EMAIL = process.env.NEWSLETTER_TEST_EMAIL?.trim() ?? ""; // admin preview address
 const BATCH = 50;
 
 type Recipient = { email: string; unsubscribe_token: string | null };
@@ -25,6 +25,7 @@ export async function publishEmail(
 
   let recipients: Recipient[];
   if (opts.test) {
+    if (!TEST_EMAIL) throw new Error("NEWSLETTER_TEST_EMAIL not set");
     const { data } = await supabase
       .from("subscribers")
       .select("unsubscribe_token")

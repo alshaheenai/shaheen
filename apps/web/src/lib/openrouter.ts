@@ -3,6 +3,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
 type ModelCfg = { model: string; temperature: number; max_tokens: number | null };
 let modelCache: Record<string, ModelCfg> | null = null;
 
@@ -88,7 +90,7 @@ export async function chat(args: ChatArgs): Promise<string> {
   if (mt) body.max_tokens = mt;
   if (args.json) body.response_format = { type: "json_object" };
 
-  const res = await fetch(OPENROUTER_URL, {
+  const fetchOptions = {
     method: "POST",
     headers: {
       Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
@@ -97,15 +99,41 @@ export async function chat(args: ChatArgs): Promise<string> {
       "X-Title": "Al-Shaheen",
     },
     body: JSON.stringify(body),
-  });
+  };
 
-  if (!res.ok) {
+  // Bounded retry: 3 attempts, exponential backoff (~1s, 2s). Retry only on
+  // network errors / 429 / 5xx; fail fast on other 4xx. recordUsage runs only on
+  // the successful call, so token/cost accounting stays accurate.
+  const MAX_ATTEMPTS = 3;
+  let lastErr: Error | null = null;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    let res: Response;
+    try {
+      res = await fetch(OPENROUTER_URL, fetchOptions);
+    } catch (e) {
+      lastErr = e instanceof Error ? e : new Error(String(e)); // network error — retryable
+      if (attempt < MAX_ATTEMPTS) {
+        await sleep(1000 * 2 ** (attempt - 1));
+        continue;
+      }
+      throw lastErr;
+    }
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.usage) recordUsage(args.task, data.usage);
+      return data.choices?.[0]?.message?.content ?? "";
+    }
+
+    if ((res.status === 429 || res.status >= 500) && attempt < MAX_ATTEMPTS) {
+      lastErr = new Error(`OpenRouter ${cfg.model} ${res.status}`);
+      await sleep(1000 * 2 ** (attempt - 1));
+      continue;
+    }
     const t = await res.text();
     throw new Error(`OpenRouter ${cfg.model} ${res.status}: ${t.slice(0, 300)}`);
   }
-  const data = await res.json();
-  if (data.usage) recordUsage(args.task, data.usage);
-  return data.choices?.[0]?.message?.content ?? "";
+  throw lastErr ?? new Error("OpenRouter: exhausted retries");
 }
 
 // Extract a JSON value from a model response that may be fenced or chatty.

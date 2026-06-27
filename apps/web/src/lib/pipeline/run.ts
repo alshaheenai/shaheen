@@ -13,6 +13,7 @@ import type {
   ToolItem,
   BrandVoice,
 } from "./types";
+import { tg, ADMIN_CHAT_ID } from "@/lib/telegram";
 
 // The Neuron is a discovery source (competitor) — never link to their newsletter.
 // Returns null so the renderers hide the source link (original-link extraction deferred).
@@ -200,6 +201,19 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
     const relevant = ranked.filter((x) => clamp(x.s.relevance) >= RELEVANCE_MIN);
     const pool = relevant.length >= MIN_SELECTABLE ? relevant : ranked;
     const dropped = ranked.length - pool.length;
+
+    // R2: when the relevance gate collapses (weak day), alert the admin once and
+    // continue — the build already falls back to the ranked pool.
+    if (relevant.length < MIN_SELECTABLE) {
+      try {
+        await tg("sendMessage", {
+          chat_id: ADMIN_CHAT_ID(),
+          text: `⚠️ اليوم ضعيف — فقط ${relevant.length} خبر تعدّى عتبة الصلة (${RELEVANCE_MIN}). بُنيت النشرة من أفضل المتاح.`,
+        });
+      } catch {
+        // best-effort; never block the build
+      }
+    }
 
     // tools = items the classifier flagged as launchable tools (fallback: Product Hunt)
     let toolPicks = pool.filter((x) => x.s.is_tool).slice(0, TOOLS_COUNT);

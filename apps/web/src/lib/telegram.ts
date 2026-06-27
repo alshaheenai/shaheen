@@ -2,6 +2,8 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Tables } from "@/lib/database.types";
 import type { IssueBody } from "@/lib/pipeline/types";
+import { clipWords } from "@/lib/text";
+import { getBaseUrl } from "@/lib/site";
 
 const TOKEN = () => process.env.TELEGRAM_BOT_TOKEN!;
 export const ADMIN_CHAT_ID = () => process.env.TELEGRAM_ADMIN_CHAT_ID!;
@@ -30,7 +32,7 @@ export function formatReview(draft: Tables<"draft_issues">): string {
   const b = (draft.body ?? {}) as unknown as IssueBody;
   const parts: string[] = [];
   parts.push(`👁️ <b>${esc(draft.title ?? "نشرة اليوم")}</b>`);
-  if (draft.intro) parts.push(esc(clip(draft.intro, 400)));
+  if (draft.intro) parts.push(esc(clipWords(draft.intro, 400)));
 
   if (b.tldr_bullets?.length) {
     parts.push("\n<b>نظرة الشاهين</b>");
@@ -38,8 +40,8 @@ export function formatReview(draft: Tables<"draft_issues">): string {
   }
   if (b.main) {
     parts.push(`\n⚡️ <b>الانقضاضة: ${esc(b.main.title)}</b>`);
-    parts.push(esc(clip(b.main.what, 350)));
-    if (b.main.our_take) parts.push(`<b>بعين الشاهين:</b> ${esc(clip(b.main.our_take, 350))}`);
+    parts.push(esc(clipWords(b.main.what, 350)));
+    if (b.main.our_take) parts.push(`<b>بعين الشاهين:</b> ${esc(clipWords(b.main.our_take, 350))}`);
   }
   if (b.roundup?.length) {
     parts.push(`\n🪶 <b>رفّة جناح</b>`);
@@ -49,7 +51,7 @@ export function formatReview(draft: Tables<"draft_issues">): string {
     parts.push(`\n🛠️ <b>عُدّة الشاهين</b>`);
     parts.push(b.tools.map((t) => `• ${esc(t.name)}`).join("\n"));
   }
-  return clip(parts.join("\n"), 4000);
+  return clipWords(parts.join("\n"), 4000);
 }
 
 export function reviewKeyboard(draftId: string) {
@@ -161,7 +163,7 @@ export async function handleReviewAction(action: string, draftId: string): Promi
         .eq("id", draftId);
       return "⛔️ أُوقف نشر اليوم.";
     case "edit": {
-      const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/+$/, "") || "https://alshaheenai.com";
+      const base = await getBaseUrl();
       return `✏️ للتعديل من اللوحة:\n${base}/admin/issues/${draftId}`;
     }
     default:
