@@ -18,6 +18,21 @@ export const AUDIENCES = [
   "automation",
 ] as const;
 
+// ── editorial notes (نصيحة الشاهين) — Editor's standing guidance, applied semantically ──
+// Returns "" when there are no active notes so the prompts stay byte-identical to before (SC-003).
+function notesGuidance(notes: string[]): string {
+  if (!notes.length) return "";
+  const list = notes.map((n, i) => `${i + 1}) ${n}`).join("\n");
+  return `
+
+نصائح المحرّر الثابتة (رأي «الشاهين» الشخصي — اعتمده لا الخبر إن تعارضا):
+${list}
+تعليمات هذه النصائح:
+- إن انطبقت نصيحة منها فعلاً وبقوة على هذا الخبر تحديداً، اعكِس موقف المحرّر في «بعين الشاهين» (our_take) بنبرة النشرة.
+- طبّق نصيحة واحدة كحدّ أقصى لكل خبر؛ وإن لم تنطبق أي نصيحة بوضوح فلا تُقحم شيئاً (الأصل: لا تطبيق).
+- انقُل أي توصية أو رقم أو سعر أو اسم في النصيحة كما هو بأمانة تامة: لا تخفّفه ولا تعكسه ولا تتبنَّ الخيار المضادّ، حتى لو قال مصدر الخبر عكسه.`;
+}
+
 function voiceHeader(b: BrandVoice): string {
   return `أنت المحرّر الذكي لنشرة «${b.name}» — نشرة الذكاء الاصطناعي لروّاد الأعمال في الخليج.
 جمهورك رائد أعمال صغير/متناهي الصغر/متوسط (SME) بميزانية وفريق محدودين، يريد أن يبني مشروعاً أو يحسّن عمله بالذكاء الاصطناعي — اربط كل خبر بفرصة أو أداة أو فكرة عملية يقدر يطبّقها بنفسه.
@@ -63,7 +78,7 @@ ${list}
 }
 
 // ── main story full treatment ──
-export function mainStoryPrompt(b: BrandVoice, item: Candidate, summary: string) {
+export function mainStoryPrompt(b: BrandVoice, item: Candidate, summary: string, notes: string[] = []) {
   const system = `${voiceHeader(b)}
 أنت تكتب «الانقضاضة» — الخبر الرئيسي لنشرة اليوم.
 اكتب بدقّة زمنية: لا تصف منتجاً أو حدثاً معروفاً/قديماً كأنه جديد أو صدر «اليوم/أمس/للتو»؛ إن لم تتأكد من حداثته، صِفه دون إيحاء زمني خاطئ.
@@ -80,35 +95,47 @@ export function mainStoryPrompt(b: BrandVoice, item: Candidate, summary: string)
 - who: من يستفيد منه؟ (روّاد أعمال/تجار/مسوّقون/مستقلّون…)
 - how: كيف يُطبَّق عمليّاً في السوق الخليجي؟ خطوة ملموسة
 - warning: تحذير أو ملاحظة نقدية مختصرة (إن وُجد، وإلا اتركه فارغاً)
-- our_take: رأي «${b.name}» التحريري المختصر — بصيرة لا يقدر المترجم الآلي يقلّدها
+- our_take: رأي «${b.name}» التحريري المختصر — بصيرة لا يقدر المترجم الآلي يقلّدها${notesGuidance(notes)}
 
 أعد: {"title":"...","what":"...","why":"...","who":"...","how":"...","warning":"...","our_take":"..."}`;
   return { system, user };
 }
 
 // ── roundup blurbs (batched) ──
-export function roundupPrompt(b: BrandVoice, items: { id: string; title: string; summary: string }[]) {
+export function roundupPrompt(
+  b: BrandVoice,
+  items: { id: string; title: string; summary: string }[],
+  notes: string[] = []
+) {
   const system = `${voiceHeader(b)}
 أنت تكتب «رفّة جناح» — جولة أخبار سريعة. لكل خبر جملة أو جملتان عربيّتان تشرحان الخبر وأهميته بإيجاز.
 اكتب بدقّة زمنية: لا تصف منتجاً أو حدثاً معروفاً/قديماً كأنه جديد أو صدر «اليوم/أمس/للتو»؛ إن لم تتأكد من حداثته، صِفه دون إيحاء زمني خاطئ.
 أعد JSON فقط.`;
+  const guidance = notesGuidance(notes);
+  const takeField = guidance ? `,"our_take":"…(فقط إن انطبقت نصيحة على هذا الخبر، وإلا احذف الحقل)"` : "";
   const list = items.map((it) => `id="${it.id}" | ${it.title} — ${it.summary}`).join("\n");
   const user = `لكل خبر أعطِ عنواناً عربيّاً موجزاً (title) وفقرة قصيرة عملية (blurb، جملة أو جملتان) بنبرة النشرة:
-${list}
+${list}${guidance}
 
-أعد: {"items":[{"id":"...","title":"...","blurb":"..."}]}`;
+أعد: {"items":[{"id":"...","title":"...","blurb":"..."${takeField}}]}`;
   return { system, user };
 }
 
 // ── tools blurbs (batched) ──
-export function toolsPrompt(b: BrandVoice, items: { id: string; title: string; summary: string }[]) {
+export function toolsPrompt(
+  b: BrandVoice,
+  items: { id: string; title: string; summary: string }[],
+  notes: string[] = []
+) {
   const system = `${voiceHeader(b)}
 أنت تكتب «عُدّة الشاهين» — أدوات/منتجات جديدة تستحق التجربة. لكل أداة: الاسم + جملة عملية عن فائدتها لرائد الأعمال. أعد JSON فقط.`;
+  const guidance = notesGuidance(notes);
+  const takeField = guidance ? `,"our_take":"…(فقط إن انطبقت نصيحة على هذه الأداة، وإلا احذف الحقل)"` : "";
   const list = items.map((it) => `id="${it.id}" | ${it.title} — ${it.summary}`).join("\n");
   const user = `لكل أداة أعطِ name (اسم مختصر) و blurb (جملة عربية عن الفائدة العملية):
-${list}
+${list}${guidance}
 
-أعد: {"items":[{"id":"...","name":"...","blurb":"..."}]}`;
+أعد: {"items":[{"id":"...","name":"...","blurb":"..."${takeField}}]}`;
   return { system, user };
 }
 

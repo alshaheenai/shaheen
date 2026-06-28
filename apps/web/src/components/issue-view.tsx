@@ -77,6 +77,11 @@ export function IssueView({
                   )}
                 </span>
                 {r.blurb && <span className="text-muted-foreground"> — {r.blurb}</span>}
+                {r.our_take && (
+                  <p className="mt-1 rounded-md border-s-4 bg-muted/40 p-2 text-sm">
+                    <strong>{analysisLabel}:</strong> {r.our_take}
+                  </p>
+                )}
               </li>
             ))}
           </ul>
@@ -99,6 +104,11 @@ export function IssueView({
                   )}
                 </span>
                 {t.blurb && <span className="text-muted-foreground"> — {t.blurb}</span>}
+                {t.our_take && (
+                  <p className="mt-1 rounded-md border-s-4 bg-muted/40 p-2 text-sm">
+                    <strong>{analysisLabel}:</strong> {t.our_take}
+                  </p>
+                )}
               </li>
             ))}
           </ul>

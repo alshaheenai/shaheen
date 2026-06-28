@@ -21,7 +21,8 @@
   - **الاشتراك:** double opt-in — `/subscribe` + `/api/subscribe` (throttle) + `confirm` + `unsubscribe` (رابط واحد بنقرة). البريد عبر **raw-fetch إلى Resend** (`lib/email/send.ts` + `templates.ts`)، لا SDK.
   - **البريد مثبّت يصل** من `news@alshaheenai.com` (هجرة `subscribers` مطبّقة على الإنتاج؛ رسالة تأكيد اختبارية وصلت `delivered`).
   - commits: `1ce14bd` (دستور+مواصفات) · `26a3abf` (مدونة+منسّق) · `59be08a` (قناة+اشتراك) · `4d6934e` (هجرة+تأكيد البريد).
-- لوحة: /admin/{brand,sources,raw-feed,issues,models,runs} · RLS + is_admin · دخول magic-link · PostHog + Sentry
+- لوحة: /admin/{brand,sources,notes,raw-feed,issues,models,runs} · RLS + is_admin · دخول magic-link · PostHog + Sentry
+- **Feature 004 — نصيحة الشاهين (ملاحظات تحريرية ثابتة) ✅ كود مكتمل** (lint + build خضراء): جدول `editorial_notes` (RLS/admin) + صفحة `/admin/notes` (CRUD). المحرّك يحمّل النصائح الفعّالة كل بناء ويطبّقها دلالياً عبر «بعين الشاهين» الموجود (`our_take`) — بلا عقدة AI منفصلة وبلا بلوك جديد؛ `our_take` اختياري للجولة/الأدوات يظهر فقط عند تطابق نصيحة. تصيير على المدونة + البريد (قناة تيليجرام ملخّص بلا تغيير). **موقوف بإذن:** T002 (هجرة الإنتاج `supabase/migrations/0003_editorial_notes.sql`) + T008 (تحقّق حيّ بتشغيل المحرّك). إعادة التوليد (regen) تلتقط النصائح تلقائياً (FR-009).
 
 ## الحالة التقنية
 - Supabase رسمي `tciiwpzkgtsoypuaghld` (eu-central-1). الـ `supabase` MCP متصل (apply_migration/execute_sql تعمل). هجرة Phase 7 طُبّقت عبره.
@@ -50,7 +51,7 @@
 ## قبل الإطلاق
 - تدوير **كل** المفاتيح + إلغاء الـ PAT (Supabase Management API).
 - مراجعة كل المؤجّلات أعلاه.
-- **ملاحظة بيانات:** يوجد صف مشترك تجريبي `alshaheendaily@gmail.com` (status=pending) أُضيف لاختبار البريد — **احذفه أو أكّده بعد النشر** (رابط التأكيد يشير إلى `alshaheenai.com` ولن يعمل قبل النشر).
+- **ملاحظة بيانات:** صف المشترك التجريبي `alshaheendaily@gmail.com` في `subscribers` **حُذف** (R7، جلسة 2026-06-28) — بقي البريد نفسه في `admins` كحساب دخول محمد (سليم).
 
 ## طريقة العمل (Spec Kit) — بالترتيب لكل عمل جديد
 الدستور والمواصفات الأساسية جاهزة. لأي ميزة/مرحلة جديدة: `/speckit.specify` → `/speckit.clarify` → `/speckit.plan` → `/speckit.tasks` → `/speckit.implement`، مع اختبار حيّ قبل الاعتماد، وإيقاف عند الخطوات الحسّاسة (هجرات إنتاج، إرسال حقيقي، DNS، نشر عام) لإذن المستخدم خطوة بخطوة.

@@ -60,6 +60,12 @@ export type Database = {
         Update: { ad_id?: string | null; body?: Json; channel_variants?: Json; cover_image_url?: string | null; created_at?: string; gift_id?: string | null; id?: string; intro?: string | null; issue_date?: string | null; main_topic?: string | null; meta?: Json; status?: string; title?: string | null; type?: string; updated_at?: string }
         Relationships: []
       }
+      editorial_notes: {
+        Row: { id: string; body: string; active: boolean; created_at: string; updated_at: string }
+        Insert: { id?: string; body: string; active?: boolean; created_at?: string; updated_at?: string }
+        Update: { id?: string; body?: string; active?: boolean; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
       email_sends: {
         Row: { id: string; published_issue_id: string; email: string; status: string; resend_id: string | null; sent_at: string }
         Insert: { id?: string; published_issue_id: string; email: string; status?: string; resend_id?: string | null; sent_at?: string }

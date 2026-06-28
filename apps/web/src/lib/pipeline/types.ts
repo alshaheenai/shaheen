@@ -38,6 +38,7 @@ export type RoundupItem = {
   source_url: string | null;
   title: string;
   blurb: string;
+  our_take?: string; // «بعين الشاهين» — present only when an editorial note applies
 };
 
 export type ToolItem = {
@@ -45,6 +46,7 @@ export type ToolItem = {
   source_url: string | null;
   name: string;
   blurb: string;
+  our_take?: string; // «بعين الشاهين» — present only when an editorial note applies
 };
 
 export type IssueBody = {

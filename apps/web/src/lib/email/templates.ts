@@ -121,7 +121,11 @@ export function issueEmailHtml(args: {
       ? `${h2("🪶 رفّة جناح")}<ul style="margin:0;padding:0 18px 0 0;color:#3a4757;font-size:15px;line-height:1.9;">${b.roundup
           .map(
             (r) =>
-              `<li style="margin:0 0 10px;"><strong style="color:${navy};">${esc(r.title)}</strong>${r.blurb ? ` — ${esc(r.blurb)}` : ""}</li>`
+              `<li style="margin:0 0 10px;"><strong style="color:${navy};">${esc(r.title)}</strong>${r.blurb ? ` — ${esc(r.blurb)}` : ""}${
+                r.our_take
+                  ? `<div style="margin:6px 0 0;background:#f6efda;border-right:4px solid ${gold};border-radius:6px;padding:8px 12px;font-size:14px;line-height:1.8;color:${navy};"><strong>بعين الشاهين:</strong> ${esc(r.our_take)}</div>`
+                  : ""
+              }</li>`
           )
           .join("")}</ul>`
       : "";
@@ -131,7 +135,11 @@ export function issueEmailHtml(args: {
       ? `${h2("🛠️ عُدّة الشاهين")}<ul style="margin:0;padding:0 18px 0 0;color:#3a4757;font-size:15px;line-height:1.9;">${b.tools
           .map(
             (t) =>
-              `<li style="margin:0 0 10px;"><strong style="color:${navy};">${esc(t.name)}</strong>${t.blurb ? ` — ${esc(t.blurb)}` : ""}</li>`
+              `<li style="margin:0 0 10px;"><strong style="color:${navy};">${esc(t.name)}</strong>${t.blurb ? ` — ${esc(t.blurb)}` : ""}${
+                t.our_take
+                  ? `<div style="margin:6px 0 0;background:#f6efda;border-right:4px solid ${gold};border-radius:6px;padding:8px 12px;font-size:14px;line-height:1.8;color:${navy};"><strong>بعين الشاهين:</strong> ${esc(t.our_take)}</div>`
+                  : ""
+              }</li>`
           )
           .join("")}</ul>`
       : "";

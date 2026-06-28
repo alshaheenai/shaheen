@@ -35,6 +35,7 @@ export default async function AdminLayout({
     { href: "/admin", label: "الرئيسية" },
     { href: "/admin/issues", label: "النشرات" },
     { href: "/admin/sources", label: "المصادر" },
+    { href: "/admin/notes", label: "نصيحة الشاهين" },
     { href: "/admin/raw-feed", label: "المحتوى الخام" },
     { href: "/admin/runs", label: "التشغيلات والتوكنات" },
     { href: "/admin/models", label: "النماذج" },

@@ -109,6 +109,15 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
       bannedWords: brand?.banned_words ?? [],
     };
 
+    // Active editorial notes (نصيحة الشاهين) — steer «بعين الشاهين» semantically in the
+    // writers below. Reloaded every build, so a regen picks up new notes (FR-009).
+    // Empty → no prompt injection; output identical to pre-feature (SC-003).
+    const { data: noteRows } = await supabase
+      .from("editorial_notes")
+      .select("body")
+      .eq("active", true);
+    const notes = (noteRows ?? []).map((n) => n.body);
+
     // 1. candidates — recent raw_items not yet processed
     const { data: processed } = await supabase.from("processed_items").select("raw_item_id");
     const processedIds = new Set((processed ?? []).map((p) => p.raw_item_id));
@@ -230,7 +239,7 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
     await supabase.from("processed_items").update({ selected: true }).in("raw_item_id", selectedIds);
 
     // 4. write main story
-    const mp = P.mainStoryPrompt(voice, main.c, main.s.summary);
+    const mp = P.mainStoryPrompt(voice, main.c, main.s.summary, notes);
     const mainOut = await chatJSON<Omit<MainStory, "news_id" | "source_url">>({
       task: "write",
       system: mp.system,
@@ -253,20 +262,26 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
     if (roundup.length) {
       const rp = P.roundupPrompt(
         voice,
-        roundup.map((x) => ({ id: x.c.id, title: x.c.title, summary: x.s.summary }))
+        roundup.map((x) => ({ id: x.c.id, title: x.c.title, summary: x.s.summary })),
+        notes
       );
-      const rOut = await chatJSON<{ items: { id: string; title: string; blurb: string }[] }>({
+      const rOut = await chatJSON<{ items: { id: string; title: string; blurb: string; our_take?: string }[] }>({
         task: "write",
         system: rp.system,
         user: rp.user,
       });
       const rmap = new Map((rOut.items ?? []).map((i) => [i.id, i]));
-      roundupItems = roundup.map((x) => ({
-        news_id: x.c.id,
-        source_url: cleanSourceUrl(x.c.url),
-        title: rmap.get(x.c.id)?.title?.trim() || x.c.title,
-        blurb: rmap.get(x.c.id)?.blurb ?? x.s.summary,
-      }));
+      roundupItems = roundup.map((x) => {
+        const r = rmap.get(x.c.id);
+        const take = r?.our_take?.trim();
+        return {
+          news_id: x.c.id,
+          source_url: cleanSourceUrl(x.c.url),
+          title: r?.title?.trim() || x.c.title,
+          blurb: r?.blurb ?? x.s.summary,
+          ...(take ? { our_take: take } : {}), // present only when a note applied (SC-003)
+        };
+      });
     }
 
     // tools blurbs
@@ -274,20 +289,26 @@ export async function buildDailyIssue(opts?: { candidateLimit?: number }): Promi
     if (toolPicks.length) {
       const tp = P.toolsPrompt(
         voice,
-        toolPicks.map((x) => ({ id: x.c.id, title: x.c.title, summary: x.s.summary }))
+        toolPicks.map((x) => ({ id: x.c.id, title: x.c.title, summary: x.s.summary })),
+        notes
       );
-      const tOut = await chatJSON<{ items: { id: string; name: string; blurb: string }[] }>({
+      const tOut = await chatJSON<{ items: { id: string; name: string; blurb: string; our_take?: string }[] }>({
         task: "write",
         system: tp.system,
         user: tp.user,
       });
       const tm = new Map((tOut.items ?? []).map((i) => [i.id, i]));
-      toolItems = toolPicks.map((x) => ({
-        news_id: x.c.id,
-        source_url: cleanSourceUrl(x.c.url),
-        name: tm.get(x.c.id)?.name ?? x.c.title,
-        blurb: tm.get(x.c.id)?.blurb ?? x.s.summary,
-      }));
+      toolItems = toolPicks.map((x) => {
+        const t = tm.get(x.c.id);
+        const take = t?.our_take?.trim();
+        return {
+          news_id: x.c.id,
+          source_url: cleanSourceUrl(x.c.url),
+          name: t?.name ?? x.c.title,
+          blurb: t?.blurb ?? x.s.summary,
+          ...(take ? { our_take: take } : {}), // present only when a note applied (SC-003)
+        };
+      });
     }
 
     // 5. headline + intro + TL;DR

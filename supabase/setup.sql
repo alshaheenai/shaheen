@@ -174,13 +174,21 @@ create table if not exists public.pipeline_runs (
   created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
 
+-- standing editorial notes (نصيحة الشاهين) — applied semantically via «بعين الشاهين»
+create table if not exists public.editorial_notes (
+  id uuid primary key default gen_random_uuid(),
+  body text not null, active boolean not null default true,
+  created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+);
+
 -- ── updated_at triggers ──
 do $$
 declare t text;
 begin
   foreach t in array array['brand_config','app_settings','categories','sources','raw_items',
     'processed_items','gifts','ads','draft_issues','published_issues','gifts_scheduled',
-    'ads_calendar','ai_models_config','publishing_channels','subscribers','pipeline_runs']
+    'ads_calendar','ai_models_config','publishing_channels','subscribers','pipeline_runs',
+    'editorial_notes']
   loop
     execute format('drop trigger if exists trg_%1$s_updated_at on public.%1$I;', t);
     execute format('create trigger trg_%1$s_updated_at before update on public.%1$I
@@ -195,7 +203,7 @@ begin
   foreach t in array array['brand_config','app_settings','categories','sources','raw_items',
     'processed_items','gifts','ads','draft_issues','published_issues','gifts_used','gifts_scheduled',
     'ads_calendar','ai_models_config','publishing_channels','subscribers','feedback_ratings',
-    'errors_log','pipeline_runs']
+    'errors_log','pipeline_runs','editorial_notes']
   loop
     execute format('alter table public.%I enable row level security;', t);
     execute format('drop policy if exists "admin all" on public.%I;', t);
